@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .container {
+      padding: 5vh 10vw;
+      display: flex;
+      justify-content: left;
+      align-items: left;
+      flex-direction: column;
+    }
+
+    .row {
+      display: flex;
+      justify-content: left;
+      align-items: left;
+      flex-direction: row;
+    }
+
+    #searchInput {
+      width: 40%;
+      height: 3vh;
+      margin-bottom: 1vh;
+            margin-top: 5vh;
+    }
+
+    #addArticle {
+      height: 3vh;
+      margin-top: 1vh;
+    }
+
+    .formItem {
+      height: 2vh;
+      width: 100%;
+      margin-bottom: 1vh;
+      display: flex;
+      flex-direction: column;
+      align-items: space-between;
+    }
+
+    .forms {
+      width: 25vw;
+      margin-right: 10vw;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin-bottom: 5vh;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <script>
+    function searchTable() {
+      // Declare variables
+      var input, filter, table, tr, td, i, txtValue;
+      input = document.getElementById("searchInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("dataTable");
+      tr = table.getElementsByTagName("tr");
+
+      // Loop through all table rows, and hide those who don't match the search query
+      for (i = 1; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        for (k = 0; k < td.length; k++) {
+          txtValue = td[k].textContent || td[k].innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+            break;
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <form action="/add" method="post" class="forms">
+        <div>
+          <label for="id">Artikelnummer</label>
+          <input name="id" id="id" value="" class="formItem" />
+        </div>
+        <div>
+          <label for="name">Artikelbezeichnung</label>
+          <input name="name" id="name" value="" class="formItem" />
+        </div>
+        <div>
+          <label for="quantity">Lagerbestand</label>
+          <input name="quantity" id="quantity" value="" class="formItem" />
+        </div>
+        <div>
+          <button id="addArticle">Artikel Hinzufuegen</button>
+        </div>
+      </form>
+      <form action="/change" method="post" class="forms">
+        <div>
+          <label for="id">Artikelnummer</label>
+          <input name="id" id="id" value="" class="formItem" />
+        </div>
+        <div>
+          <label for="quantity">Lagerbestand</label>
+          <input name="quantity" id="quantity" value="" class="formItem" />
+        </div>
+        <div>
+          <button id="addArticle">Lagerbestand aendern</button>
+        </div>
+      </form>
+    </div>
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for names..">
+    <table id="dataTable">
+      <tr>
+        <th>Artikelbezeichung</th>
+        <th>Artikelnummer</th>
+        <th>Lagerbestand</th>
+        <th>Aktionen</th>
+      </tr>
+      §
+    </table>
+  </div>
+</body>
+
+</html>
