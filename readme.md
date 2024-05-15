@@ -1,58 +1,59 @@
-# Materialverwaltung
+# Project
 
-Ein simpler webserver, welcher als Backend c hat.
+A simple web-server with c as the backend and html as the frontend. It only runs on linux.
+This is an example project which serves no purpose and was simply for learning some low level concepts.
 
-## Kompilieren
+## Compile
 
-Um das mit dem gcc Kompiler zu machen, einfach die folgenden Kommandos benutzen. (Ka wie das mit den anderen geht)
-
-### Linux
+To compile with gcc, run the following command (on an linux machine):
 
 `gcc webapp.c database.c filemanager.c linuxweb.c -o webapp -pthread -lm`
 
-## Starten und Stoppen des Servers
+## How to Start/Stop the server
 
-Server starten mit den Kommandos oder `./webapp`<br>
-Server stoppen, indem man entweder eine Anfrage auf die Route `/stopServer` macht, woraufhin bei der nächsten abarbeitung des callstacks das Program ordnungsgemäß gestoppt wird. Alternativ kann er auch einfach mit STRG + C gestoppt werde, wobei bei dieser Variante der Server an der aktuellen Stelle unterbrochen wird, und weder der Allocierte speicher befreit wird, noch die datenbank gespeichert wird.
+Start the server with `./webapp` (The file needs to be executable. Do this with `chmod +x webapp`). An `database.txt` file needs to be present in the the working directory as well as the `pages` folder which includes the html sites<br>
+Stop the server via an http-call to the `/stopServer` endpoint to save the database in the process. But this method only executes once a second, finishing call is made.
+Another method is to just close the program by force, which also works but doesnt save the database in the proces.
 
-## Programablauf
+## Program flow
 
-- Datenbank wird erstellt
-- Die database.txt datei wird eingelesen und die Datenbank damit gefüllt
-- Ein Socket wird im Betriebsystem registriert, auf welchem auf Anfrage abgehört wird (port 3333, kann aber beim Aufruf der Funktion selbst festgelegt werden)
-- Wenn eine Anfrage kommt, wird diese auf einem Stack gespeichert, welcher mit `acceptClient` abgearbeitet wird. Dieser Funktion muss eine Buffergröße!!! und eine Callbackfunktion übergeben werden
-- Anfrage wird angenommen und ein neuer Thread registriert, damit weitere anfragen parallel laufen können
-- Ein Struct mit Methode, route und body wird erstelle und die Callbackfunktion damit aufgerufen
-- Je nach anfrage werden dann die verschiedenen html dokumente geladen und weitere sachen damit gemacht
-- Wenn die STOPSERVER variable 1 ist, wird vor der nächsten Abarbeitung des Stacks die While schleife unterbrochen und das program beginnt sich zu beenden
-- Beim betriebssystem wird die Socket wieder freigegeben
-- Für die komplette Datenbank wird ein String erstellt, welcher anschließend in eine Datei geschrieben wird
-- Zuletzt wird der Allociert speicher für die Datenbank freigegeben
+- The database is created
+- The database is filled with values from the database.txt file
+- A socket for our app is requested from the kernel on which it listens for incoming requests. The port for this socket is hardcoded in the `webapp.c` file (3333)
+- Every incoming request is added onto an stack. This stack can then be processed with the `acceptClient` function, which takes a buffer size and an callback function which is called for every request.
+- An request is picked and registered as a new thread, so that multiple requests can be processed in parallel.
+- For the request, a struct with method, route and body is created and passed to the callback function
+- Depending on the request and the logic defined in the callback function, some actions are performed
+- If the STOPSERVER variable is 1, the next try to process an request breaks out of the while loop and the program begins to close
+- The socket is freed
+- The database is dumped into an string and saved into the `database.txt` file
+- At last, the allocated memory for the database is freed
 
-## Erklärung der einzelnen Teile
+## Explanation of the files
 
 ### webapp.c
 
-Dies ist der einstiegspunkt des Programs welcher die main function beinhaltet. In dieser müssen alle Header der anderen Dateien included sein (in den dateien an sich ist dies nicht notwendig. Bsp.: wenn database.c keine deklarierungen von database.h benötigt, muss database.h nicht in database.c included sein, da database.h nur Funktionsprototypen bestitzt. Da aber in webapp.c alle funktionen der anderen Dateine benötigt werden, muss auch darin alle Header dateien included sein). Die Datei ist eigentlich nur dafür da, um die Funktionen der anderen Dateien aufzurufen und somit einen sauberen Überblick über die Funktionsweise zu ermöglichen. Wichtig ist, dass in dieser Datei das Callback deklariert werden muss, welches an jede Anfrage übergeben wird.
+This is the entry point of the program which contains the main function. All headers of the other files must be included in this function (this is not necessary in the files themselves. Example: if database.c does not need any declarations from database.h, database.h does not have to be included in database.c, as database.h only has function prototypes. However, since all functions of the other files are required in webapp.c, all header files must also be included in it). The file is actually only there to call the functions of the other files and thus provide a clear overview of the functionality. It is important that the callback that is passed to each request is declared in this file.
 
 ### database.c
 
-Diese beinhaltet alle Funktionen, für welche die Datenbank benutzt wird. Die Datenbank ist eine simple einfach verkettete Liste von `Item` elementen. Hierbei ist das Startelement, welche an alle Funktionen als database pointer übergeben wird lediglich ein Element, mit den Werten NULL, wodurch der Anfang makiert wird. Wenn eine Funktion dann aufgerufen wird wird dieses Startelement übergeben, wodurch dank der next pointer durch die Liste iteriert werden kann.<br>
-Wenn ein neues Element hinzugefügt wird direkt geschaut, an welche stelle es Alphabetisch sortiert hingehört, wodurch die Liste zu jeder Zeit alpahabetisch sortiert ist.<br>
-Die CreateHTML methode ist eine besonder, da diese das Eingelesene datatable.html dokument mit den Werten der Datenbank füllt. Hierbei wird `§` als Platzhalter genommen.
+This contains all the functions for a very simple database. The database is a linked list of `Item` elements. The start element, which is passed to all functions as a database pointer, is simply an element with the value NULL, which marks the start. If a function is then called, this start element is passed, which allows iteration through the list thanks to the next pointer.<br>
+When a new element is added, the system looks directly at where it belongs alphabetically, so that the list is sorted alphabetically at all times.<br>
+The CreateHTML method is special because it fills the datatable.html document with the values from the database. Here, `§` is used as a placeholder.
 
 ### filemanager.c
 
-Diese Datei beinhaltet zwei Funktionen zum Speichern und Lesen von Dateien.
+This file contains two functions for saving and reading files.
 
 ### linuxweb.c
 
-Diese Datei beinhaltet alle Funktionen, welche zum Betreiben eines Webservers vonnöten sind. Dies sind:
-- Ein Socket registrieren
-- Anfragen annehmen und diese Auf einen neuen Thread setzten
-- Anfragen bearbeiten
-- Die Anfragen zu parsen, damit die Daten leicht zu benutzen sind
-- Antworten and den Clienten zu schicken (200 Success und 404 Not found)
-- Ein Map datentyp zu parsen damit der mitgesendete Body des Clienten einfach als Key-Value paare abgearbeitet werden können
-Die Funktionsweise der Registrierung eines Webservers wurde bereits oben erklärt
+This file contains all the functions required to operate a web server. These are
+- Register a socket
+- Accepting requests and setting them to a new thread
+- Processing requests
+- Parsing the requests so that the data is easy to use
+- Send responses to the client (200 Success and 404 Not found)
+- Parse a map data type so that the body sent by the client can be easily processed as key-value pairs
+The functionality of the registration of a web server has already been explained above
+
 

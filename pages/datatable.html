@@ -96,42 +96,42 @@
     <div class="row">
       <form action="/add" method="post" class="forms">
         <div>
-          <label for="id">Artikelnummer</label>
+          <label for="id">ID</label>
           <input name="id" id="id" value="" class="formItem" />
         </div>
         <div>
-          <label for="name">Artikelbezeichnung</label>
+          <label for="name">Name</label>
           <input name="name" id="name" value="" class="formItem" />
         </div>
         <div>
-          <label for="quantity">Lagerbestand</label>
+          <label for="quantity">Quantity</label>
           <input name="quantity" id="quantity" value="" class="formItem" />
         </div>
         <div>
-          <button id="addArticle">Artikel Hinzufuegen</button>
+          <button id="addArticle">Add item</button>
         </div>
       </form>
       <form action="/change" method="post" class="forms">
         <div>
-          <label for="id">Artikelnummer</label>
+          <label for="id">ID</label>
           <input name="id" id="id" value="" class="formItem" />
         </div>
         <div>
-          <label for="quantity">Lagerbestand</label>
+          <label for="quantity">Quantity</label>
           <input name="quantity" id="quantity" value="" class="formItem" />
         </div>
         <div>
-          <button id="addArticle">Lagerbestand aendern</button>
+          <button id="addArticle">Change Item</button>
         </div>
       </form>
     </div>
     <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for names..">
     <table id="dataTable">
       <tr>
-        <th>Artikelbezeichung</th>
-        <th>Artikelnummer</th>
-        <th>Lagerbestand</th>
-        <th>Aktionen</th>
+        <th>Name</th>
+        <th>ID</th>
+        <th>Quantity</th>
+        <th>Actions</th>
       </tr>
       §
     </table>
